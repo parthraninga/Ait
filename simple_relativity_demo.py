@@ -87,22 +87,27 @@ class SimpleRelativityDemo:
         self.ax.add_patch(mov_clock)
         
         # Animate clock hands
+        stat_hand_line = None
+        mov_hand_line = None
+        
         for i in range(20):
             # Clear previous hands
-            if i > 0:
-                self.ax.lines = [line for line in self.ax.lines if line.get_color() not in ['cyan', 'orange']]
+            if stat_hand_line is not None:
+                stat_hand_line.remove()
+            if mov_hand_line is not None:
+                mov_hand_line.remove()
             
             # Stationary clock hand (faster)
             stat_angle = i * np.pi / 5
             stat_x = -6.5 + 0.6 * np.cos(stat_angle - np.pi/2)
             stat_y = 2 + 0.6 * np.sin(stat_angle - np.pi/2)
-            self.ax.plot([-6.5, stat_x], [2, stat_y], color='cyan', linewidth=3)
+            stat_hand_line = self.ax.plot([-6.5, stat_x], [2, stat_y], color='cyan', linewidth=3)[0]
             
             # Moving clock hand (slower due to time dilation)
             mov_angle = i * np.pi / 8  # Slower
             mov_x = 6.5 + 0.6 * np.cos(mov_angle - np.pi/2)
             mov_y = 2 + 0.6 * np.sin(mov_angle - np.pi/2)
-            self.ax.plot([6.5, mov_x], [2, mov_y], color='orange', linewidth=3)
+            mov_hand_line = self.ax.plot([6.5, mov_x], [2, mov_y], color='orange', linewidth=3)[0]
             
             # Time dilation formula
             self.ax.text(0, -1, "Δt' = γΔt", fontsize=16, color='yellow', ha='center', weight='bold')

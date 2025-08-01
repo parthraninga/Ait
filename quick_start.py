@@ -46,6 +46,68 @@ def install_basic_packages():
         print("✅ All basic packages are already installed")
         return True
 
+def install_voiceover_packages():
+    """Install packages for text-to-speech narration"""
+    packages = ["edge-tts", "pygame", "pydub"]
+    print("Installing voiceover packages...")
+    
+    missing_packages = [pkg for pkg in packages if not check_package(pkg.replace('-', '_'))]
+    
+    if missing_packages:
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install"] + packages)
+            print("✅ Voiceover packages installed successfully!")
+            print("🎙️ You can now generate professional narration!")
+            return True
+        except subprocess.CalledProcessError:
+            print("❌ Failed to install voiceover packages")
+            return False
+    else:
+        print("✅ All voiceover packages are already installed")
+        return True
+
+def generate_subtitles():
+    """Generate subtitle files"""
+    try:
+        print("📝 Generating subtitle files...")
+        subprocess.run([sys.executable, "generate_subtitles.py"], check=True)
+    except subprocess.CalledProcessError:
+        print("❌ Failed to generate subtitles")
+    except FileNotFoundError:
+        print("❌ generate_subtitles.py not found")
+
+def create_video_with_subtitles():
+    """Create video with audio and subtitles"""
+    if not check_package("edge_tts"):
+        print("❌ edge-tts not installed. Please install voiceover packages first (option B)")
+        return
+    
+    try:
+        print("🎬 Creating video with audio and subtitles...")
+        subprocess.run([
+            sys.executable, "-m", "manim", 
+            "-pql", "relativity_subtitles.py", "RelativityWithSubtitles"
+        ], check=True)
+        print("✅ Video with subtitles created successfully!")
+    except subprocess.CalledProcessError:
+        print("❌ Failed to create video with subtitles")
+    except FileNotFoundError:
+        print("❌ relativity_subtitles.py not found")
+
+def generate_narration():
+    """Generate audio narration files"""
+    if not check_package("edge_tts"):
+        print("❌ edge-tts not installed. Please install voiceover packages first (option A)")
+        return
+    
+    try:
+        print("🎙️ Generating professional narration...")
+        subprocess.run([sys.executable, "generate_narration.py"], check=True)
+    except subprocess.CalledProcessError:
+        print("❌ Failed to generate narration")
+    except FileNotFoundError:
+        print("❌ generate_narration.py not found")
+
 def install_manim():
     """Install Manim for advanced video creation"""
     if check_package("manim"):
@@ -106,6 +168,12 @@ def show_menu():
     print("5. 🎬 Render enhanced explainer video (low quality)")
     print("6. 🎬 Render enhanced explainer video (high quality)")
     print()
+    print("VOICEOVER & NARRATION:")
+    print("A. 🎙️ Generate professional narration audio")
+    print("B. 🔊 Install text-to-speech packages")
+    print("C. 📝 Generate subtitle files (SRT/VTT)")
+    print("D. 🎬 Create video with audio + subtitles")
+    print()
     print("SETUP:")
     print("7. 📦 Install basic packages (matplotlib, numpy)")
     print("8. 📦 Install Manim for advanced videos")
@@ -155,7 +223,7 @@ def main():
     
     while True:
         show_menu()
-        choice = input("\nEnter your choice (0-9): ").strip()
+        choice = input("\nEnter your choice (0-9, A, B, C, D): ").strip().upper()
         
         if choice == "0":
             print("Thank you for exploring Einstein's Theory of Relativity!")
@@ -198,8 +266,20 @@ def main():
         elif choice == "9":
             check_system()
             
+        elif choice == "A":
+            generate_narration()
+            
+        elif choice == "B":
+            install_voiceover_packages()
+            
+        elif choice == "C":
+            generate_subtitles()
+            
+        elif choice == "D":
+            create_video_with_subtitles()
+            
         else:
-            print("❌ Invalid choice. Please enter a number between 0-9.")
+            print("❌ Invalid choice. Please enter 0-9, A, B, C, or D.")
         
         if choice != "0":
             input("\nPress Enter to continue...")
