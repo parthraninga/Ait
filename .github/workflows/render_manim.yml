@@ -1,0 +1,50 @@
+name: Render Manim Video
+
+# This workflow runs on every push to the main branch
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  render-video:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+
+    steps:
+      # 1. Checkout your repository code
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Specify Python version
+
+      # 3. Install a full LaTeX distribution (this is the slowest step)
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full
+
+      # 4. Install FFmpeg (required by Manim)
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      # 5. Install Manim using pip
+      - name: Install Manim
+        run: pip install manim
+
+      # 6. Run Manim to render the video
+      #    Replace 'proof.py' and 'PythagoreanTheorem' with your file and class name
+      - name: Render the video with Manim
+        run: manim -pql proof.py PythagoreanTheorem
+
+      # 7. Upload the generated video as an artifact
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: manim-video # Name of the artifact
+          path: media/videos/proof/480p15/PythagoreanTheorem.mp4 # Path to the video file
